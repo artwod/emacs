@@ -436,6 +436,8 @@ size, and full-buffer size."
     (setq shr-state nil))
   (cond
    ((eq shr-folding-mode 'none)
+    (unless shr-start
+      (setq shr-start (point)))
     (insert text))
    (t
     (when (and (string-match "\\`[ \t\n ]" text)
@@ -852,7 +854,7 @@ START, and END.  Note that START and END should be markers."
 
 (defun shr-heading (cont &rest types)
   (shr-ensure-paragraph)
-  (apply #'shr-fontize-cont cont types)
+  (shr-fontize-cont cont types 'font-lock-function-name-face)
   (shr-ensure-paragraph))
 
 (defun shr-urlify (start url &optional title)
@@ -1256,7 +1258,7 @@ The preference is a float determined from `shr-prefer-media-type'."
   (let ((shr-folding-mode 'none))
     (shr-ensure-newline)
     (shr-indent)
-    (shr-generic cont)
+    (shr-fontize-cont cont 'font-lock-builtin-face)
     (shr-ensure-newline)))
 
 (defun shr-tag-blockquote (cont)
@@ -1327,7 +1329,7 @@ The preference is a float determined from `shr-prefer-media-type'."
   (shr-heading cont 'bold))
 
 (defun shr-tag-h3 (cont)
-  (shr-heading cont 'italic))
+  (shr-heading cont 'italic 'underline))
 
 (defun shr-tag-h4 (cont)
   (shr-heading cont))
@@ -1337,6 +1339,9 @@ The preference is a float determined from `shr-prefer-media-type'."
 
 (defun shr-tag-h6 (cont)
   (shr-heading cont))
+
+(defun shr-tag-code (cont)
+  (shr-fontize-cont cont 'font-lock-variable-name-face))
 
 (defun shr-tag-hr (_cont)
   (shr-ensure-newline)
